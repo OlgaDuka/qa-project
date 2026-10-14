@@ -1,4 +1,4 @@
-const helloPrefix = 'Hello, '
+const helloPrefix = 'Hello'
 
 function greet(name) {
   return `${helloPrefix}, ${name}!`
