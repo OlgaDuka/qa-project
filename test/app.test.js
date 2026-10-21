@@ -42,7 +42,17 @@ describe('nameIsValid', () => {
 
 describe('fullTrim', () => {
   it('возвращает строку без пробелов', () => {
-    expect(fullTrim('Осень краски разводила в капельках дождя')).toBe('Осенькраскиразводилавкапелькахдождя')
+    expect(fullTrim('hello world')).toBe('helloworld')
+  })
+
+  it('удаляет множественные пробелы в любом месте строки', () => {
+    expect(fullTrim('hello   world')).toBe('helloworld')
+    expect(fullTrim('  hello world  ')).toBe('helloworld')
+  })
+
+  it('возвращает пустую строку для null/undefined', () => {
+    expect(fullTrim(null)).toBe('')
+    expect(fullTrim(undefined)).toBe('')
   })
 })
 
