@@ -1,5 +1,5 @@
 function myFunction(name) {
-  return `Первая функция, созданная ${name}`;
+  return `Первая функция, созданная ${name}`
 }
 
-console.log(myFunction("Ольгой"));
+console.log(myFunction('Ольгой'))
