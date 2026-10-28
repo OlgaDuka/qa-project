@@ -38,3 +38,60 @@ export const getTotal = (items = [], discount = 0) => {
   const total = items.reduce((acc, { price, quantity }) => acc + price * quantity, 0)
   return total * (1 - discount / 100)
 }
+
+/**
+ * Подсчёт успеваемости группы студентов, вариант 1
+ * Жесткий вариант функции, если входные данные их внешних источников
+ *
+ * @param {[{nik: string, balls: number}]} students
+ * @returns {number}
+ * @throws Вернёт ошибку, если аргумент не массив или массив пустой
+ * @throws Вернёт ошибку, если какой-либо из элементов массива не объект
+ * @throws Вернёт ошибку, если в каком-либо объекте (элементе массива) свойство balls не число
+ * @example getScore([{ nik: 'Olga', balls: 10 }, { nik: 'Masha', balls: 15 }]) // 25
+ */
+
+export const getScore = (students = []) => {
+  if (!Array.isArray(students)) {
+    throw new TypeError('Аргумент функции должен быть массивом')
+  }
+
+  if (students.length === 0) {
+    throw new Error('Входной массив не должен быть пустым')
+  }
+
+  return students.reduce((acc, student) => {
+    if (typeof student !== 'object' || student === null) {
+      throw new TypeError('Каждый элемент массива должен быть объектом')
+    }
+    if (typeof student.balls !== 'number') {
+      throw new TypeError(`У студента ${student.nik} свойство balls имеет тип ${typeof student.balls}, а не number`)
+    }
+    return acc + student.balls
+  }, 0)
+}
+
+/**
+ * Подсчёт успеваемости группы студентов, вариант 2
+ * Вариант функции для внутренних расчетов: если какой-либо из элементов массива не объект или
+ * в каком-либо объекте свойство balls не число, просто заменяем значение на 0
+ *
+ * @param {[{nik: string, balls: number}]} students
+ * @returns {number}
+ * @throws Вернёт ошибку, если аргумент не массив или массив пуст.
+ * @example getScore2([{ nik: 'Olga', balls: 10 }, { nik: 'Masha', balls: 15 }]) // 25
+ */
+
+export const getScore2 = (students = []) => {
+  if (!Array.isArray(students)) {
+    throw new TypeError('Аргумент функции должен быть массивом')
+  }
+
+  if (students.length === 0) {
+    throw new Error('Входной массив не должен быть пустым')
+  }
+
+  return students.reduce((acc, student) => {
+    return acc + (typeof student?.balls === 'number' ? student.balls : 0)
+  }, 0)
+}
