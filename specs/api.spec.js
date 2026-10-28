@@ -70,12 +70,22 @@ describe('Bookstore API', () => {
         }),
       })
 
-    const data = await response.json()
-
-    expect(response.status).toEqual(200)
-    expect(data.status).toBe('Failed')
-    expect(data.result).toContain('User authorization failed.')
+    expect(response.status).toEqual(400)
   })
+  // Данный тест падает - выявлена неверная работа АПИ, в доке указано, что должен возвращаться статус 400,
+  // на самом деле при ошибке всегда возвращается 200. Кроме того, при ошибке должен вернуться объект вида:
+  // {
+  //   "code": 0,
+  //   "message": "string"
+  // },
+  // однако реально получаем объект с такими же полями, как и при успешном выполнении, но с нулевым токеном:
+  // {
+  //     "token": null,
+  //     "expires": null,
+  //     "status": "Failed",
+  //     "result": "User authorization failed."
+  // }
+  // Необходимо привести в соответствие работу АПИ и документацию
 
   test('генерация токена успешно', async () => {
     const response = await fetch(
