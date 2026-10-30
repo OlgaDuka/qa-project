@@ -32,9 +32,11 @@ describe('Bookstore API', () => {
 
     const data = await response.json()
 
+    expect(data).toMatchObject({
+      code: '1204',
+      message: expect.stringContaining('User exists!')
+    })
     expect(response.status).toEqual(406)
-    expect(data.code).toBe('1204')
-    expect(data.message).toContain('User exists!')
   })
 
   test('создание пользователя с ошибкой — пароль составлен не по правилам', async () => {
@@ -52,9 +54,11 @@ describe('Bookstore API', () => {
 
     const data = await response.json()
 
+    expect(data).toMatchObject({
+      code: '1300',
+      message: expect.stringContaining('Passwords must have')
+    })
     expect(response.status).toEqual(400)
-    expect(data.code).toBe('1300')
-    expect(data.message).toContain('Passwords must have')
   })
 
   test('генерация токена с ошибкой', async () => {
@@ -102,9 +106,10 @@ describe('Bookstore API', () => {
 
     const data = await response.json()
 
-    expect(response.status).toEqual(200)
     expect(data.token).toBeTruthy()
+    expect(data.expires).toBeTruthy()
     expect(data.status).toBe('Success')
     expect(data.result).toContain('User authorized successfully.')
+    expect(response.status).toEqual(200)
   })
 })
