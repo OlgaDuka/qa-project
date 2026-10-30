@@ -8,7 +8,7 @@ export default [
   pluginJs.configs.recommended,
   eslintPluginPrettierRecommended,
   {
-    files: ['test/**'],
+    files: ['test/**', 'specs/**'],
     ...jest.configs['flat/recommended'],
   },
 ]
