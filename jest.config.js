@@ -197,4 +197,9 @@ const config = {
   // watchman: true,
 }
 
-module.exports = config
+module.exports = {
+  transform: {
+    '^.+\\.(js|ts)$': 'babel-jest',
+  },
+  transformIgnorePatterns: ['/node_modules/(?!(.*@faker-js.*))'],
+}
