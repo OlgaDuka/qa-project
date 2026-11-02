@@ -1,14 +1,15 @@
-const baseUrl = 'https://bookstore.demoqa.com'
+import config from '../framework/config/config'
+
 let createdUserName
 let response_status
 
 describe('Bookstore API', () => {
   beforeAll(async () => {
     createdUserName = `user_${Date.now()}`
-    const response = await fetch(`${baseUrl}/Account/v1/User`, {
+    const response = await fetch(`${config.baseUrl}/Account/v1/User`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userName: createdUserName, password: 'Test@1234' }),
+      body: JSON.stringify({ userName: createdUserName, password: config.current_password }),
     })
     response_status = response.status
   })
@@ -19,7 +20,7 @@ describe('Bookstore API', () => {
 
   test('создание пользователя с ошибкой — логин уже используется', async () => {
     const response = await fetch(
-      `${baseUrl}/Account/v1/User`, {
+      `${config.baseUrl}/Account/v1/User`, {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
@@ -41,14 +42,14 @@ describe('Bookstore API', () => {
 
   test('создание пользователя с ошибкой — пароль составлен не по правилам', async () => {
     const response = await fetch(
-      `${baseUrl}/Account/v1/User`, {
+      `${config.baseUrl}/Account/v1/User`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userName: `user2_${Date.now()}`,
-          password: "bad_password",
+          password: config.invalid_password,
         }),
       })
 
@@ -63,14 +64,14 @@ describe('Bookstore API', () => {
 
   test('генерация токена с ошибкой', async () => {
     const response = await fetch(
-      `${baseUrl}/Account/v1/GenerateToken`, {
+      `${config.baseUrl}/Account/v1/GenerateToken`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userName: "nonexistent_user",
-          password: "password_error",
+          password: config.invalid_password,
         }),
       })
 
@@ -93,7 +94,7 @@ describe('Bookstore API', () => {
 
   test('генерация токена успешно', async () => {
     const response = await fetch(
-      `${baseUrl}/Account/v1/GenerateToken`, {
+      `${config.baseUrl}/Account/v1/GenerateToken`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
