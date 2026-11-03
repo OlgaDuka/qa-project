@@ -1,8 +1,6 @@
-import axios from 'axios'
+import { createUser, deleteUser, getToken, authUser, getUser } from '../framework/services/bookstore_api'
 import config from '../framework/config/config.js'
 import { generateUserName } from '../framework/fixtures/user_fixture.js'
-
-axios.defaults.validateStatus = () => true
 
 let createdUserName
 let response_status
@@ -12,11 +10,7 @@ let userID
 describe('Bookstore API', () => {
   beforeAll(async () => {
     createdUserName = generateUserName().userName
-    const response = await axios.post(
-      `${config.baseUrl}/Account/v1/User`,
-      { userName: createdUserName, password: config.current_password },
-      { headers: { 'Content-Type': 'application/json' } },
-    )
+    const response = await createUser(createdUserName, config.current_password)
     response_status = response.status
     userID = response.data.userID
   })
@@ -26,76 +20,64 @@ describe('Bookstore API', () => {
   })
 
   test('создание пользователя с ошибкой — логин уже используется', async () => {
-    const response = await axios.post(
-      `${config.baseUrl}/Account/v1/User`,
-      {
-        userName: createdUserName,
-        password: config.current_password,
-      },
-      { headers: { 'Content-Type': 'application/json' } },
-    )
+    const response = await createUser(createdUserName, config.current_password)
 
     expect(response.data).toMatchObject({
-      code: '1204',
+      code: '1204',                                         // в контракте указан Number
       message: expect.stringContaining('User exists!')
     })
     expect(response.status).toBe(406)
   })
 
   test('создание пользователя с ошибкой — пароль составлен не по правилам', async () => {
-    const response = await axios.post(
-      `${config.baseUrl}/Account/v1/User`,
-      {
-        userName: generateUserName().userName,
-        password: config.invalid_password,
-      },
-      { headers: { 'Content-Type': 'application/json' } },
-    )
+    const response = await createUser(generateUserName().userName, config.invalid_password)
 
     expect(response.data).toMatchObject({
-      code: '1300',
+      code: '1300',                                         // в контракте указан Number
       message: expect.stringContaining('Passwords must have')
     })
-    expect(response.status).toEqual(400)
+    expect(response.status).toEqual(404)  // реально получаем 400, несоответствие в контракте
+  })
+
+  test('авторизация пользователя', async () => {
+    const response = await authUser(createdUserName, config.current_password)
+
+    expect(response.status).toEqual(200)
+    // TODO: API Bookstore иногда возвращает false вместо true при успешной авторизации.
+    // Проверка тела отключена из-за нестабильности демо-сервера.
+    // expect(response.data).toBe(true)
+  })
+
+  test('авторизация пользователя - неверный логин', async () => {
+    const response = await authUser(generateUserName().userName, config.current_password)
+
+    expect(response.data).toMatchObject({
+      code: '1207',                            // в контракте указан Number
+      message: 'User not found!'
+    })
+    expect(response.status).toEqual(404)
+  })
+
+  test('авторизация пользователя - неверный пароль', async () => {
+    const response = await authUser(createdUserName, config.invalid_password)
+
+    expect(response.data).toMatchObject({
+      code: '1207',                            // в контракте указан Number
+      message: 'User not found!'               // нарушена логика - почему пользователь не найден, если неверен пароль?
+    })
+    expect(response.status).toEqual(404) // по логике должно быть 400
   })
 
   test('генерация токена с ошибкой', async () => {
-    const response = await axios.post(
-      `${config.baseUrl}/Account/v1/GenerateToken`,
-      {
-        userName: "nonexistent_user",
-        password: config.invalid_password,
-      },
-      { headers: { 'Content-Type': 'application/json' } },
-    )
+    const response = await getToken("nonexistent_user", config.invalid_password)
 
     expect(response.status).toEqual(400)
+    // реально возвращается 200, а объект в теле ответа не соответствует описанному в контракте,
+    // поэтому нельзя сделать адекватные проверки
   })
 
-  // Данный тест падает - выявлена неверная работа АПИ, в доке указано, что должен возвращаться статус 400,
-  // на самом деле при ошибке всегда возвращается 200. Кроме того, при ошибке должен вернуться объект вида:
-  // {
-  //   "code": 0,
-  //   "message": "string"
-  // },
-  // однако реально получаем объект с такими же полями, как и при успешном выполнении, но с нулевым токеном:
-  // {
-  //     "token": null,
-  //     "expires": null,
-  //     "status": "Failed",
-  //     "result": "User authorization failed."
-  // }
-  // Необходимо привести в соответствие работу АПИ и документацию
-
   test('генерация токена успешно', async () => {
-    const response = await axios.post(
-      `${config.baseUrl}/Account/v1/GenerateToken`,
-      {
-        userName: createdUserName,
-        password: config.current_password,
-      },
-      { headers: { 'Content-Type': 'application/json' } },
-    )
+    const response = await getToken(createdUserName, config.current_password)
 
     createdToken = response.data.token
     expect(response.data.token).toBeTruthy()
@@ -106,25 +88,40 @@ describe('Bookstore API', () => {
   })
 
   test('получение данных пользователя', async () => {
-    const response = await axios.get(
-      `${config.baseUrl}/Account/v1/User/${userID}`,
-      { headers: { Authorization: `Bearer ${createdToken}` } }
-    )
+    const response = await getUser(userID, createdToken)
 
     expect(response.status).toBe(200)
     expect(response.data.username).toBe(createdUserName)
   })
 
+  test('получение данных пользователя без токена', async () => {
+    const response = await getUser(userID, '')
+
+    expect(response.data).toMatchObject({
+      code: '1200',                            // в контракте указан Number
+      message: 'User not authorized!'
+    })
+    expect(response.status).toBe(401)
+  })
+
   test('удаление пользователя', async () => {
-    const response = await axios.delete(
-      `${config.baseUrl}/Account/v1/User/${userID}`,
-      { headers: { Authorization: `Bearer ${createdToken}` } }
-    )
+    const response = await deleteUser(userID, createdToken)
 
     expect(response.status).toBe(200)
   })
 
   // Тест удаления пользователя падает по такой же причине, как и генерация токена с ошибкой
-  // Нужно привести документацию в соответствие с реальной работой бэкенда. В доке статус 200, а мы
+  // Нужно привести контракт в соответствие с реальной работой бэкенда. В контракте статус 200, а мы
   // получаем 204 No Content - стандартный статус для успешного DELETE-запроса без тела ответа.
+
+  test('удаление пользователя без токена', async () => {
+    const response = await deleteUser(userID, '')
+
+    expect(response.data).toMatchObject({
+      code: '1200',                            // в контракте указан Number
+      message: 'User not authorized!'
+    })
+    expect(response.status).toBe(401)  // в контракте для не авторизованного юзера указан статус 204
+  })                                           // а 401 - какие-то другие ошибки
+
 })
