@@ -56,3 +56,30 @@ export const deleteUser = (userId, token) =>
   api.delete(`${apiUrls.user}/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   })
+
+export const getBooks = () => api.get(`${apiUrls.books}`)
+
+export const postBooks = (userId, collectionOfIsbns) => api.post(`${apiUrls.books}`, { userId, collectionOfIsbns })
+
+export const deleteBooks = (userId, token) =>
+  api.delete(`${apiUrls.books}`, {
+    data: { userId },
+    headers: { Authorization: `Bearer ${token}` },
+  })
+
+export const putBooks = (userId, isbn, token) =>
+  api.put(
+    `${apiUrls.books}/${isbn}`,
+    { userId },
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  )
+
+export const getBook = (isbn) => api.get(`${apiUrls.book}/${isbn}`)
+
+export const deleteBook = (isbn, userId, token) =>
+  api.delete(`${apiUrls.book}`, {
+    data: { isbn, userId },
+    headers: { Authorization: `Bearer ${token}` },
+  })
