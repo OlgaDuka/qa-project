@@ -1,4 +1,4 @@
-import { createUser, deleteUser, getToken, authUser, getUser } from '../framework/services/bookstore_api'
+import { createUser, deleteUser, getToken, authUser, getUser } from '../framework/services/api_axios'
 import config from '../framework/config/config.js'
 import { generateUserName } from '../framework/fixtures/user_fixture.js'
 
@@ -6,6 +6,7 @@ let createdUserName
 let response_status
 let createdToken
 let userID
+const invalid_password = '12345678'
 
 describe('Bookstore API', () => {
   beforeAll(async () => {
@@ -30,7 +31,7 @@ describe('Bookstore API', () => {
   })
 
   test('создание пользователя с ошибкой — пароль составлен не по правилам', async () => {
-    const response = await createUser(generateUserName().userName, config.invalid_password)
+    const response = await createUser(generateUserName().userName, invalid_password)
 
     expect(response.data).toMatchObject({
       code: '1300',                                         // в контракте указан Number
@@ -59,7 +60,7 @@ describe('Bookstore API', () => {
   })
 
   test('авторизация пользователя - неверный пароль', async () => {
-    const response = await authUser(createdUserName, config.invalid_password)
+    const response = await authUser(createdUserName, invalid_password)
 
     expect(response.data).toMatchObject({
       code: '1207',                            // в контракте указан Number
@@ -69,7 +70,7 @@ describe('Bookstore API', () => {
   })
 
   test('генерация токена с ошибкой', async () => {
-    const response = await getToken("nonexistent_user", config.invalid_password)
+    const response = await getToken("nonexistent_user", invalid_password)
 
     expect(response.status).toEqual(400)
     // реально возвращается 200, а объект в теле ответа не соответствует описанному в контракте,
