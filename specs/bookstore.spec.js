@@ -40,8 +40,6 @@ describe('Bookstore API', () => {
     const isbn = '1234567890'
     const response = await getBook(isbn)
 
-    console.log('response.data: ', response.data)
-
     expect(response.data).toMatchObject({
       code: '1205',                            // в контракте указан Number
       message: 'ISBN supplied is not available in Books Collection!'
@@ -52,8 +50,6 @@ describe('Bookstore API', () => {
   test('получить информацию о книге', async () => {
     const isbn = isbnList[2]
     const response = await getBook(isbn)
-
-    console.log('response.data: ', response.data)
 
     expect(response.data).toEqual({
       isbn: isbn,
@@ -109,12 +105,24 @@ describe('Bookstore API', () => {
     expect(response.status).toBe(201)
   })
 
+  test('замена книги в списке пользователя без токена', async () => {
+    const isbn = isbnList[0]
+    const replaceIsbn = isbnList[5]
+    const response = await putBooks(userID, isbn, replaceIsbn, '')
+
+    expect(response.data).toMatchObject({
+      code: '1200',                            // в контракте указан Number
+      message: 'User not authorized!'
+    })
+    expect(response.status).toBe(401)
+  })
+
+
   test('замена книги в списке пользователя', async () => {
     const isbn = isbnList[0]
     const replaceIsbn = isbnList[5]
     const response = await putBooks(userID, isbn, replaceIsbn, createdToken)
 
-    console.log('response.data: ', response.data)
     expect(response.data).toMatchObject({
       userId: `${userID}`,
       username: `${createdUserName}`,
@@ -154,8 +162,6 @@ describe('Bookstore API', () => {
 
     const response = await deleteBook(isbn, userID, createdToken)
 
-    console.log('response.data: ', response.data)
-
     //expect(response.data).toMatchObject({
     //  userId: `${userID}`,
     //  isbn: isbnList[1],
@@ -167,8 +173,6 @@ describe('Bookstore API', () => {
   test('удаление всех книг пользователя без токена', async () => {
     const response = await deleteBooks(userID, '')
 
-    console.log('response.data: ', response.data)
-
     expect(response.data).toMatchObject({
       code: '1200',                            // в контракте указан Number
       message: 'User not authorized!'
@@ -178,8 +182,6 @@ describe('Bookstore API', () => {
 
   test('удаление всех книг пользователя', async () => {
     const response = await deleteBooks(userID, createdToken)
-
-    console.log('response.data: ', response.data)
 
     //expect(response.data).toMatchObject({
     //  userId: `${userID}`,
