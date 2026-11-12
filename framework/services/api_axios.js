@@ -57,27 +57,63 @@ export const deleteUser = (userId, token) =>
     headers: { Authorization: `Bearer ${token}` },
   })
 
+/** Получение списка всех книг
+ * @returns {Promise<AxiosResponse>} ответ сервера с массивом книг
+ */
 export const getBooks = () => api.get(`${apiUrls.books}`)
 
-export const postBooks = (userId, collectionOfIsbns) => api.post(`${apiUrls.books}`, { userId, collectionOfIsbns })
+/**
+ * Добавление коллекции книг в список пользователя
+ * @param {string} userId - ID пользователя
+ * @param {string[]} collectionOfIsbns - массив ISBN добавляемых книг
+ * @param {string} token - токен авторизации
+ * @returns {Promise<AxiosResponse>} ответ сервера
+ */
+export const postBooks = (userId, collectionOfIsbns, token) =>
+  api.post(`${apiUrls.books}`, { userId, collectionOfIsbns }, { headers: { Authorization: `Bearer ${token}` } })
 
+/**
+ * Удаление всех книг пользователя
+ * @param {string} userId - ID пользователя
+ * @param {string} token - токен авторизации
+ * @returns {Promise<AxiosResponse>} ответ сервера
+ */
 export const deleteBooks = (userId, token) =>
-  api.delete(`${apiUrls.books}`, {
-    data: { userId },
+  api.delete(`${apiUrls.books}?UserId=${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   })
 
-export const putBooks = (userId, isbn, token) =>
+/**
+ * Добавление книги в список пользователя
+ * @param {string} userId - ID пользователя
+ * @param {string} isbn - ISBN заменяемой книги в коллекции пользователя
+ * @param replaceIsbn - ISBN добавляемой книги
+ * @param {string} token - токен авторизации
+ * @returns {Promise<AxiosResponse>} ответ сервера
+ */
+export const putBooks = (userId, isbn, replaceIsbn, token) =>
   api.put(
     `${apiUrls.books}/${isbn}`,
-    { userId },
+    { userId, isbn: `${replaceIsbn}` },
     {
       headers: { Authorization: `Bearer ${token}` },
     }
   )
 
-export const getBook = (isbn) => api.get(`${apiUrls.book}/${isbn}`)
+/**
+ * Получение информации о книге по ISBN
+ * @param {string} isbn - ISBN книги
+ * @returns {Promise<AxiosResponse>} ответ сервера с данными книги
+ */
+export const getBook = (isbn) => api.get(`${apiUrls.book}?ISBN=${isbn}`)
 
+/**
+ * Удаление книги из списка пользователя
+ * @param {string} isbn - ISBN удаляемой книги
+ * @param {string} userId - ID пользователя
+ * @param {string} token - токен авторизации
+ * @returns {Promise<AxiosResponse>} ответ сервера
+ */
 export const deleteBook = (isbn, userId, token) =>
   api.delete(`${apiUrls.book}`, {
     data: { isbn, userId },
