@@ -1,3 +1,4 @@
+import Ajv from 'ajv'
 import { createUser, getBooks, getToken, postBooks, deleteBooks, putBooks, getBook, deleteBook, authUser } from '../framework/services/api_axios'
 import config from '../framework/config/config.js'
 import { generateUserName } from '../framework/fixtures/user_fixture.js'
@@ -6,6 +7,26 @@ let createdUserName
 let createdToken
 let userID
 let isbnList
+let booksResponse
+
+const ajv = new Ajv()
+const bookSchema = {
+  type: 'object',
+  properties: {
+    isbn: { type: 'string' },
+    title: { type: 'string' },
+    subTitle: { type: 'string' },
+    author: { type: 'string' },
+    publish_date: { type: 'string' },
+    publisher: { type: 'string' },
+    pages: { type: 'number' },
+    description: { type: 'string' },
+    website: { type: 'string' },
+  },
+  required: ['isbn'],
+}
+const bookValidate = ajv.compile(bookSchema)
+
 
 describe('Bookstore API', () => {
   beforeAll(async () => {
@@ -24,7 +45,7 @@ describe('Bookstore API', () => {
     console.log('isUserAuth: ', isUserAuth.data)
 
     // 4. Получаем список ISBN
-    const booksResponse = await getBooks()
+    booksResponse = await getBooks()
 
     // eslint-disable-next-line jest/no-standalone-expect
     expect(booksResponse.status).toBe(200)
@@ -47,22 +68,17 @@ describe('Bookstore API', () => {
     expect(response.status).toBe(400)
   })
 
-  test('получить информацию о книге', async () => {
-    const isbn = isbnList[2]
-    const response = await getBook(isbn)
+  test('получить информацию о книгах', async () => {
+    const books = booksResponse.data.books
 
-    expect(response.data).toEqual({
-      isbn: isbn,
-      title: expect.any(String),
-      subTitle: expect.any(String),
-      author: expect.any(String),
-      publish_date: expect.any(String),
-      publisher: expect.any(String),
-      pages: expect.any(Number),
-      description: expect.any(String),
-      website: expect.any(String),
-    })
-    expect(response.status).toBe(200)
+    for (const book of books) {
+      const response = await getBook(book.isbn)
+      const isValidBook = bookValidate(response.data)
+
+      expect(bookValidate.errors).toStrictEqual(null)
+      expect(isValidBook).toBe(true)
+      expect(response.status).toBe(200)
+    }
   })
 
   test('добавление книг в список пользователя без токена', async () => {
