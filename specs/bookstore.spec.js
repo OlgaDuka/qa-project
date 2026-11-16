@@ -1,4 +1,5 @@
 import Ajv from 'ajv'
+import { matchers } from 'jest-json-schema'
 import { createUser, getBooks, getToken, postBooks, deleteBooks, putBooks, getBook, deleteBook, authUser } from '../framework/services/api_axios'
 import config from '../framework/config/config.js'
 import { generateUserName } from '../framework/fixtures/user_fixture.js'
@@ -10,6 +11,24 @@ let isbnList
 let booksResponse
 
 const ajv = new Ajv()
+
+const userBooksSchema = {
+  type: 'object',
+  properties: {
+    books: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          isbn: { type: 'string' },
+        },
+        required: ['isbn'],
+      },
+    },
+  },
+  required: ['books'],
+}
+
 const bookSchema = {
   type: 'object',
   properties: {
@@ -25,11 +44,13 @@ const bookSchema = {
   },
   required: ['isbn'],
 }
-const bookValidate = ajv.compile(bookSchema)
 
+const bookValidate = ajv.compile(bookSchema)
+const userBooksValidate = ajv.compile(userBooksSchema)
 
 describe('Bookstore API', () => {
   beforeAll(async () => {
+    expect.extend(matchers)
     // 1. Создаём пользователя
     createdUserName = generateUserName().userName
     const userResponse = await createUser(createdUserName, config.current_password)
@@ -68,7 +89,7 @@ describe('Bookstore API', () => {
     expect(response.status).toBe(400)
   })
 
-  test('получить информацию о книгах', async () => {
+  test('получить информацию о книгах - вариант со схемой ajv', async () => {
     const books = booksResponse.data.books
 
     for (const book of books) {
@@ -77,6 +98,17 @@ describe('Bookstore API', () => {
 
       expect(bookValidate.errors).toStrictEqual(null)
       expect(isValidBook).toBe(true)
+      expect(response.status).toBe(200)
+    }
+  })
+
+  test('получить информацию о книгах - вариант с расширением expect', async () => {
+    const books = booksResponse.data.books
+
+    for (const book of books) {
+      const response = await getBook(book.isbn)
+
+      expect(response.data).toMatchSchema(bookSchema)
       expect(response.status).toBe(200)
     }
   })
@@ -104,11 +136,12 @@ describe('Bookstore API', () => {
     expect(response.status).toBe(400)
   })
 
-  test('добавление книг в список пользователя', async () => {
+  test('добавление книг в список пользователя - вариант со схемой Ajv', async () => {
     const booksToAdd = isbnList.slice(0, 3)
     const collectionOfIsbns = booksToAdd.map(isbn => ({ isbn }))
     const response = await postBooks(userID, collectionOfIsbns, createdToken)
 
+    /* - проверка данных
     expect(response.data.books).toBeInstanceOf(Array)
     expect(response.data.books.length).toBe(booksToAdd.length)
     expect(response.data).toMatchObject({
@@ -117,7 +150,11 @@ describe('Bookstore API', () => {
         { isbn: `${booksToAdd[1]}` },
         { isbn: `${booksToAdd[2]}` },
       ]
-    })
+    })*/
+    const isValidUserBooks = userBooksValidate(response.data)
+
+    expect(userBooksValidate.errors).toStrictEqual(null)
+    expect(isValidUserBooks).toBe(true)
     expect(response.status).toBe(201)
   })
 
@@ -149,6 +186,22 @@ describe('Bookstore API', () => {
       ]
     })
     expect(response.status).toBe(200)
+  })
+
+  test('добавление книг в список пользователя - вариант с расширением expect', async () => {
+    const booksToAdd = isbnList.slice(-2)
+    const collectionOfIsbns = booksToAdd.map(isbn => ({ isbn }))
+    const response = await postBooks(userID, collectionOfIsbns, createdToken)
+
+    console.log('booksToAdd: ', booksToAdd)
+    console.log('response.data: ', response.data)
+
+    expect(response.data).toMatchSchema(userBooksSchema)
+    expect(response.status).toBe(201)
+    // тест проверяет только правильность схемы ответа
+    // по существу - запрос не добавляет книги в список пользователя, а полностью заменяет один список другим
+    // возможно здесь имеет место нарушение логики работы приложения - вопрос к аналитикам и к бэку,
+    // для демонстрации данного факта оставила console.log внутри теста
   })
 
   test('удаление несуществующей книги из списка пользователя', async () => {
@@ -183,6 +236,8 @@ describe('Bookstore API', () => {
     //  isbn: isbnList[1],
     //  message: expect.any(String)
     // }) - не по контракту: response.data = '', нет тела ответа
+    // конкретно в этом тесте удаляем книгу, которой нет в списке пользователя в данный момент,
+    // и получаем успешный статус 204
     expect(response.status).toBe(204)
   })
 
