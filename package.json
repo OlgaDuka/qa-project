@@ -10,7 +10,11 @@
     "start": "node src/main.js",
     "lint:ci": "eslint .",
     "lint": "eslint . --fix",
-    "test": "jest"
+    "pretest": "node -e \"require('node:fs').rmSync('allure-results', { recursive: true, force: true })\"",
+    "test": "jest",
+    "allure:clean": "node -e \"for (const dir of ['allure-results', 'allure-report']) require('node:fs').rmSync(dir, { recursive: true, force: true })\"",
+    "allure:generate": "allure generate ./allure-results --clean",
+    "allure:open": "allure open ./allure-report"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
@@ -18,6 +22,8 @@
     "@eslint/js": "^9.18.0",
     "@faker-js/faker": "^10.6.0",
     "@types/jest": "^30.0.0",
+    "allure": "^3.33.0",
+    "allure-jest": "^3.14.0",
     "babel-jest": "^30.5.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
@@ -25,6 +31,7 @@
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^15.14.0",
     "jest": "^30.5.2",
+    "jest-html-reporter": "^4.4.3",
     "jest-json-schema": "^6.1.0",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.4.2"

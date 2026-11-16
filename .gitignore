@@ -4,4 +4,6 @@ coverage
 reports
 build
 .env
+allure-results
+allure-report
 
