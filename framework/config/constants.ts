@@ -7,4 +7,4 @@ export const apiUrls = {
   token: '/Account/v1/GenerateToken',
   book: '/BookStore/v1/Book',
   books: '/BookStore/v1/Books',
-}
+} as const

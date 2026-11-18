@@ -1,14 +1,16 @@
 import Ajv from 'ajv'
 import { matchers } from 'jest-json-schema'
 import { createUser, getBooks, getToken, postBooks, deleteBooks, putBooks, getBook, deleteBook, authUser } from '../framework/services/api_axios'
-import config from '../framework/config/config.js'
-import { generateUserName } from '../framework/fixtures/user_fixture.js'
+import config from '../framework/config/config'
+import { generateUserName } from '../framework/fixtures/user_fixture'
+import type { BooksResponse } from '../framework/services/api_axios'
+import type { AxiosResponse } from 'axios'
 
-let createdUserName
-let createdToken
-let userID
-let isbnList
-let booksResponse
+let createdUserName!: string
+let createdToken!: string
+let userID!: string
+let isbnList!: string[]
+let booksResponse!: AxiosResponse<BooksResponse>
 
 const ajv = new Ajv()
 

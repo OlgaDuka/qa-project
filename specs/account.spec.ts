@@ -1,12 +1,12 @@
 import { createUser, deleteUser, getToken, authUser, getUser } from '../framework/services/api_axios'
-import config from '../framework/config/config.js'
-import { generateUserName } from '../framework/fixtures/user_fixture.js'
+import config from '../framework/config/config'
+import { generateUserName } from '../framework/fixtures/user_fixture'
 
-let createdUserName
-let response_status
-let createdToken
-let userID
-const invalid_password = '12345678'
+let createdUserName!: string
+let response_status!: number
+let createdToken!: string
+let userID!: string
+const invalid_password: string = '12345678'
 
 describe('Bookstore API', () => {
   beforeAll(async () => {
