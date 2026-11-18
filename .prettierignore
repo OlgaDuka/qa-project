@@ -3,3 +3,5 @@ build
 dist
 coverage
 specs/
+jest-html-reporters-attach/
+jest_html_reporters/
