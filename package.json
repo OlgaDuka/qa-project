@@ -5,9 +5,11 @@
   "author": "Olga Duka",
   "keywords": [],
   "license": "MIT license",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "node src/main.js",
+    "prestart": "npm run build",
+    "start": "node dist/main.js",
+    "build": "tsc -p tsconfig.build.json",
     "type-check": "tsc --noEmit",
     "lint:ci": "eslint .",
     "lint": "eslint . --fix",

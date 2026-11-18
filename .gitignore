@@ -3,7 +3,7 @@ node_modules
 coverage
 reports
 build
+dist
 .env
 allure-results
 allure-report
-

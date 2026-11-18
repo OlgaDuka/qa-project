@@ -1,4 +1,4 @@
-function myFunction(name) {
+function myFunction(name: string): string {
   return `Первая функция, созданная ${name}`
 }
 
