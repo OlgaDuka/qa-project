@@ -1,0 +1,34 @@
+{
+  // Настройки TypeScript для всего проекта.
+  // Проверка типов: npx tsc --noEmit (или npm run type-check).
+  // Сборка в JS: npx tsc -p tsconfig.build.json (или npm run build).
+  "compilerOptions": {
+    // Проверяем только типы: JS-код для тестов собирает Babel (см. babel.config.js),
+    // приложение собирается отдельным конфигом tsconfig.build.json
+    "noEmit": true,
+
+    /* Окружение: Node.js, тесты запускаются в Jest */
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "types": ["node", "jest"],
+
+    /* Совместимость с транспиляцией через Babel (babel-jest) */
+    // Каждый файл обрабатывается отдельно, поэтому `import type` обязателен для типов
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+
+    /* Строгая проверка типов */
+    "strict": true,
+
+    /* Прочее */
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*.ts", "framework/**/*.ts", "specs/**/*.ts", "test/**/*.ts", "typings/**/*.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
