@@ -1,8 +1,9 @@
 import config from '../framework/config/config'
-import { apiUrls } from '../framework/config/constants.js'
+import { apiUrls } from '../framework/config/constants'
+import type { ApiErrorResponse, TokenResponse } from '../framework/types/api'
 
-let createdUserName
-let response_status
+let createdUserName!: string
+let response_status!: number
 
 describe('Bookstore API', () => {
   beforeAll(async () => {
@@ -32,7 +33,7 @@ describe('Bookstore API', () => {
       }),
     })
 
-    const data = await response.json()
+    const data = (await response.json()) as ApiErrorResponse
 
     expect(data).toMatchObject({
       code: '1204',
@@ -54,7 +55,7 @@ describe('Bookstore API', () => {
         }),
       })
 
-    const data = await response.json()
+    const data = (await response.json()) as ApiErrorResponse
 
     expect(data).toMatchObject({
       code: '1300',
@@ -106,7 +107,7 @@ describe('Bookstore API', () => {
         }),
       })
 
-    const data = await response.json()
+    const data = (await response.json()) as TokenResponse
 
     expect(data.token).toBeTruthy()
     expect(data.expires).toBeTruthy()

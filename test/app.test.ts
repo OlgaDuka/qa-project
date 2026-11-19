@@ -1,4 +1,5 @@
-import { nameIsValid, getTotal, fullTrim, getScore, getScore2 } from '../src/app.js'
+import { nameIsValid, getTotal, fullTrim, getScore, getScore2 } from '../src/app'
+import type { CartItem, Student } from '../src/app'
 
 describe('nameIsValid', () => {
   it('возвращает true для валидного имени', () => {
@@ -57,7 +58,14 @@ describe('fullTrim', () => {
 })
 
 describe('getTotal', () => {
-  const validData = [
+  type ValidTotalCase = {
+    name: string
+    buys: CartItem[]
+    discount: number
+    expected: number
+  }
+
+  const validData: ValidTotalCase[] = [
     {
       name: 'без дисконта',
       buys: [{ quantity: 10, name: 'product1', price: 10 }],
@@ -80,7 +88,14 @@ describe('getTotal', () => {
     expect(result).toEqual(expected)
   })
 
-  const invalidData = [
+  type InvalidTotalCase = {
+    name: string
+    buys: CartItem[]
+    discount: number | null
+    error: string
+  }
+
+  const invalidData: InvalidTotalCase[] = [
     {
       name: 'дисконт не является числом',
       buys: [{ quantity: 10, name: 'product4', price: 10 }],
@@ -99,12 +114,13 @@ describe('getTotal', () => {
   ]
 
   it.each(invalidData)('%s', ({ buys, discount, error }) => {
-    expect(() => getTotal(buys, discount)).toThrow(error)
+    // Значение заведомо неверного типа передаём намеренно: проверяем валидацию во время выполнения
+    expect(() => getTotal(buys, discount as number)).toThrow(error)
   })
 })
 
 describe('getScore', () => {
-  const students = [
+  const students: Student[] = [
     { nik: 'Olga', balls: 10 },
     { nik: 'Masha', balls: 15 },
     { nik: 'Misha', balls: 4 },
@@ -119,7 +135,13 @@ describe('getScore', () => {
     expect(result).toEqual(75)
   })
 
-  const invalidData = [
+  type InvalidStudentsCase = {
+    name: string
+    students: unknown
+    error: string | RegExp
+  }
+
+  const invalidData: InvalidStudentsCase[] = [
     {
       name: 'Входные данные не массив',
       students: 25,
@@ -151,7 +173,7 @@ describe('getScore', () => {
   })
 
   // Дополнительный тест на определение невалидного типа свойства balls
-  const balls_types = [
+  const balls_types: Array<{ name: string; value: unknown }> = [
     { name: 'string', value: '15 баллов' },
     { name: 'boolean', value: true },
     { name: 'null', value: null },
@@ -169,21 +191,21 @@ describe('getScore', () => {
     // expect(() => getScore(students)).toThrow(/У студента .* свойство balls имеет тип .*, а не number/)
     // Но для отладки теста интересно получить сообщение в консоль:
 
-    let error
+    let error: Error | undefined
     try {
       getScore(students)
     } catch (e) {
-      error = e
+      error = e instanceof Error ? e : new Error(String(e))
     }
 
     expect(error).toBeDefined()
-    expect(error.message).toMatch(/У студента .* свойство balls имеет тип .*, а не number/)
-    console.log(`тип ${name}: ${error.message}`)
+    expect(error?.message).toMatch(/У студента .* свойство balls имеет тип .*, а не number/)
+    console.log(`тип ${name}: ${error?.message}`)
   })
 })
 
 describe('getScore2', () => {
-  const students_example = [
+  const students_example: Student[] = [
     { nik: 'Olga', balls: 10 },
     { nik: 'Masha', balls: 15 },
     { nik: 'Misha', balls: 4 },
@@ -193,7 +215,13 @@ describe('getScore2', () => {
     { nik: 'Rostik', balls: 8 },
   ]
 
-  const validData = [
+  type ValidScore2Case = {
+    name: string
+    students: unknown
+    expected: number
+  }
+
+  const validData: ValidScore2Case[] = [
     {
       name: 'Данные верны',
       students: students_example,
@@ -220,7 +248,13 @@ describe('getScore2', () => {
     expect(result).toEqual(expected)
   })
 
-  const invalidData = [
+  type InvalidScore2Case = {
+    name: string
+    students: unknown
+    error: string
+  }
+
+  const invalidData: InvalidScore2Case[] = [
     {
       name: 'Входные данные не массив',
       students: 25,

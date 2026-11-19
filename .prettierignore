@@ -1,5 +1,6 @@
 reports
 build
+dist
 coverage
 specs/
 jest-html-reporters-attach/

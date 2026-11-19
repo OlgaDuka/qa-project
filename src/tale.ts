@@ -1,7 +1,7 @@
-function kolobok(name) {
-  const characters = ['лиса', 'дедушка', 'бабушка', 'медведь', 'волк']
-  const characters_case = ['Меня съели', 'дедушки', 'бабушки', 'медведя', 'волка']
-  const n = characters.indexOf(name)
+function kolobok(name: string): string {
+  const characters: string[] = ['лиса', 'дедушка', 'бабушка', 'медведь', 'волк']
+  const characters_case: string[] = ['Меня съели', 'дедушки', 'бабушки', 'медведя', 'волка']
+  const n: number = characters.indexOf(name)
 
   if (n !== -1) {
     if (n === 0) {
@@ -14,10 +14,10 @@ function kolobok(name) {
   return 'Мне встретился персонаж из другой сказки'
 }
 
-function kolobok_switch(name) {
-  const characters = ['лиса', 'дедушка', 'бабушка', 'медведь', 'волк']
-  const characters_case = ['Меня съели', 'дедушки', 'бабушки', 'медведя', 'волка']
-  const n = characters.indexOf(name)
+function kolobok_switch(name: string): string {
+  const characters: string[] = ['лиса', 'дедушка', 'бабушка', 'медведь', 'волк']
+  const characters_case: string[] = ['Меня съели', 'дедушки', 'бабушки', 'медведя', 'волка']
+  const n: number = characters.indexOf(name)
 
   switch (n) {
     case -1:
@@ -37,9 +37,9 @@ console.log(kolobok_switch('бабушка'))
 console.log(kolobok_switch('лиса'))
 console.log(kolobok_switch('чудо-юдо'))
 
-function newYear(name) {
-  const characters = ['Дед Мороз', 'Снегурочка']
-  const n = characters.indexOf(name)
+function newYear(name: string): string {
+  const characters: string[] = ['Дед Мороз', 'Снегурочка']
+  const n: number = characters.indexOf(name)
 
   switch (n) {
     case -1:

@@ -5,9 +5,12 @@
   "author": "Olga Duka",
   "keywords": [],
   "license": "MIT license",
-  "main": "main.js",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "node src/main.js",
+    "prestart": "npm run build",
+    "start": "node dist/main.js",
+    "build": "tsc -p tsconfig.build.json",
+    "type-check": "tsc --noEmit",
     "lint:ci": "eslint .",
     "lint": "eslint . --fix",
     "pretest": "node -e \"require('node:fs').rmSync('allure-results', { recursive: true, force: true })\"",
@@ -19,9 +22,11 @@
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
     "@eslint/js": "^9.18.0",
     "@faker-js/faker": "^10.6.0",
     "@types/jest": "^30.0.0",
+    "@types/node": "^26.6.6",
     "allure": "^3.33.0",
     "allure-jest": "^3.14.0",
     "babel-jest": "^30.5.2",
@@ -34,7 +39,9 @@
     "jest-html-reporter": "^4.4.3",
     "jest-json-schema": "^6.1.0",
     "npm-run-all2": "^7.0.2",
-    "prettier": "^3.4.2"
+    "prettier": "^3.4.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.73.0"
   },
   "dependencies": {
     "ajv": "^8.20.0",

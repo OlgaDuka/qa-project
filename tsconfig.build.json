@@ -1,0 +1,17 @@
+{
+  // Сборка приложения в JavaScript: npx tsc -p tsconfig.build.json
+  // Результат — каталог dist/ (например, dist/main.js).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    // Собираем в CommonJS: так готовый код запускается обычным `node`
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "verbatimModuleSyntax": false,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+}
