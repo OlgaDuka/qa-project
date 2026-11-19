@@ -4,4 +4,8 @@ coverage
 reports
 build
 .env
+allure-results
+allure-report
+jest-html-reporters-attach/
+jest_html_reporters/
 

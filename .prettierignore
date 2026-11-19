@@ -2,3 +2,5 @@ reports
 build
 coverage
 specs/
+jest-html-reporters-attach/
+jest_html_reporters/
