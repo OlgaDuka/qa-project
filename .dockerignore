@@ -1,0 +1,7 @@
+node_modules
+.idea
+reports
+allure-report
+allure-results
+jest-html-reporters-attach
+coverage
